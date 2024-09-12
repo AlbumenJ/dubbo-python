@@ -14,4 +14,7 @@ WORKDIR /app
 
 RUN python /app/setup.py
 
+RUN pip uninstall protobuf -y && \
+  pip install protobuf
+
 ENTRYPOINT ["python", "/app/server.py"]
