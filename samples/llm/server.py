@@ -20,15 +20,16 @@ from dubbo.configs import ServiceConfig
 from dubbo.proxy.handlers import RpcMethodHandler, RpcServiceHandler
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+model = AutoModelForCausalLM.from_pretrained(
+    "Qwen/Qwen2-0.5B-Instruct",
+    torch_dtype="auto",
+    device_map="auto"
+)
+
+tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-0.5B-Instruct")
+
 def generate(request):
     print(f"Received request: {request.prompt}")
-    model = AutoModelForCausalLM.from_pretrained(
-        "Qwen/Qwen2-0.5B-Instruct",
-        torch_dtype="auto",
-        device_map="auto"
-    )
-
-    tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-0.5B-Instruct")
 
     messages = [
         {"role": "system", "content": "You are a helpful assistant."},
