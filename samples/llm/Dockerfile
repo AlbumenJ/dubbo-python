@@ -7,7 +7,7 @@ RUN apt update && apt install -y git vim && \
   pip install . && \
   pip install transformers && \
   pip install accelerate && \
-  pip install protobuf \
+  pip install protobuf
 
 ADD . /app
 WORKDIR /app
