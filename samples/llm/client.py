@@ -32,7 +32,7 @@ class GreeterServiceStub:
 
 
 if __name__ == "__main__":
-    registry_config = RegistryConfig.from_url("zookeeper://mse-791d01018-zk.mse.aliyuncs.com:2181")
+    registry_config = RegistryConfig.from_url("zookeeper://zookeeper:2181")
     bootstrap = dubbo.Dubbo(registry_config=registry_config)
 
     reference_config = ReferenceConfig(
