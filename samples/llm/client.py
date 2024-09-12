@@ -21,7 +21,7 @@ from dubbo.configs import ReferenceConfig
 
 class GreeterServiceStub:
     def __init__(self, client: dubbo.Client):
-        self.generate = client.client_stream(
+        self.generate = client.server_stream(
             method_name="generate",
             request_serializer=llm_pb2.GenerateRequest.SerializeToString,
             response_deserializer=llm_pb2.GenerateReply.FromString,
