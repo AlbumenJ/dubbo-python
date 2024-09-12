@@ -14,6 +14,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 import abc
+import socket
 from dataclasses import dataclass
 from typing import Optional, Union
 
@@ -448,9 +449,12 @@ class ServiceConfig(AbstractConfig):
         :return: The URL.
         :rtype: URL
         """
+        hostname = socket.gethostname()
+        ip = socket.gethostbyname(hostname)
+
         return URL(
             scheme=self.protocol,
-            host=common_constants.LOCAL_HOST_VALUE,
+            host=ip,
             port=self.port,
             parameters={
                 common_constants.SERVICE_KEY: self.service_handler.service_name

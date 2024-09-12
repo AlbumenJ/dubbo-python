@@ -38,7 +38,7 @@ if __name__ == "__main__":
         method_handlers={"sayHello": method_handler},
     )
 
-    registry_config = RegistryConfig.from_url("zookeeper://127.0.0.1:2181")
+    registry_config = RegistryConfig.from_url("zookeeper://mse-791d01018-p.zk.mse.aliyuncs.com:2181")
     bootstrap = dubbo.Dubbo(registry_config=registry_config)
 
     service_config = ServiceConfig(service_handler)
