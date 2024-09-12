@@ -45,6 +45,7 @@ def generate(request):
     # 将输入文本转换为模型可以接受的张量，并确保 input_ids 类型为 LongTensor
     model_inputs = tokenizer([text], return_tensors="pt").to("cuda")
     model_inputs.input_ids = model_inputs.input_ids.long()
+    attention_mask = model_inputs['attention_mask']
 
     # 逐步生成 token 并实时返回
     generated_ids = []
@@ -56,9 +57,13 @@ def generate(request):
         output = model.generate(
             model_inputs.input_ids,
             max_new_tokens=20,  # 每次生成 20 个 token
+            attention_mask=attention_mask,  # 传递 attention_mask
             output_scores=False,
             return_dict_in_generate=True,
-            do_sample=False  # 确保生成是确定性的
+            do_sample=True,  # 开启采样生成
+            temperature=0.7,  # 控制生成文本的多样性
+            top_p=0.8,  # 核采样
+            top_k=20  # top-k 采样
         )
 
         # 提取生成的新 token
