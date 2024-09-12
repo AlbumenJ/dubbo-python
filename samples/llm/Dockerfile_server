@@ -8,8 +8,8 @@ RUN apt update && apt install -y git vim && \
 ADD . /app
 
 RUN git clone https://github.com/albumenj/dubbo-python.git && \
-  git checkout 0912-llm && \
   cd dubbo-python && \
+  git checkout 0912-llm && \
   pip install -r requirements.txt && \
   pip install .
 
