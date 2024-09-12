@@ -22,12 +22,12 @@ from transformers import AutoModelForCausalLM, AutoTokenizer
 
 def generate(request):
     print(f"Received request: {request.prompt}")
-
     model = AutoModelForCausalLM.from_pretrained(
         "Qwen/Qwen2-0.5B-Instruct",
         torch_dtype="auto",
         device_map="auto"
     )
+
     tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-0.5B-Instruct")
 
     messages = [
@@ -40,20 +40,29 @@ def generate(request):
         tokenize=False,
         add_generation_prompt=True
     )
+
     model_inputs = tokenizer([text], return_tensors="pt").to("cuda")
 
-    generated_ids = model.generate(
-        model_inputs.input_ids,
-        max_new_tokens=512000
-    )
-    generated_ids = [
-        output_ids[len(input_ids):] for input_ids, output_ids in zip(model_inputs.input_ids, generated_ids)
-    ]
+    generated_ids = []
+    for step in range(0, 512000, 50):
+        output = model.generate(
+            model_inputs.input_ids,
+            max_new_tokens=50,
+            output_scores=False,
+            return_dict_in_generate=True,
+            do_sample=False
+        )
 
-    response = tokenizer.batch_decode(generated_ids, skip_special_tokens=True)[0]
+        new_tokens = output.sequences[:, model_inputs.input_ids.shape[-1]:]
+        generated_ids.append(new_tokens)
 
-    yield llm_pb2.GenerateReply(message=str(response))
-    # yield llm_pb2.GenerateReply(message=str("test"))
+        partial_response = tokenizer.decode(new_tokens[0], skip_special_tokens=True)
+
+        yield llm_pb2.GenerateReply(message=str(partial_response))
+
+        model_inputs = tokenizer(
+            partial_response, return_tensors="pt", truncation=True, padding="longest"
+        ).to("cuda")
 
 if __name__ == "__main__":
     # build a method handler
