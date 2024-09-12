@@ -68,6 +68,7 @@ def generate(request):
         partial_response = tokenizer.decode(new_tokens[0], skip_special_tokens=True)
 
         # 通过 yield 返回部分生成结果
+        print(str(partial_response))
         yield llm_pb2.GenerateReply(message=str(partial_response))
 
         # 如果生成的内容包含结束标记，提前停止生成
