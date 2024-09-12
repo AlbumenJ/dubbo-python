@@ -449,12 +449,10 @@ class ServiceConfig(AbstractConfig):
         :return: The URL.
         :rtype: URL
         """
-        hostname = socket.gethostname()
-        ip = socket.gethostbyname(hostname)
-
+        import utils
         return URL(
             scheme=self.protocol,
-            host=ip,
+            host=utils.NetworkUtils.get_host_ip(),
             port=self.port,
             parameters={
                 common_constants.SERVICE_KEY: self.service_handler.service_name

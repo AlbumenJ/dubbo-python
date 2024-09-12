@@ -158,7 +158,13 @@ class NetworkUtils:
         :return: The IP address of the host machine.
         :rtype: str
         """
-        return socket.gethostbyname(NetworkUtils.get_host_name())
+        addresses = psutil.net_if_addrs()
+        for interface, addrs in addresses.items():
+            for addr in addrs:
+                if addr.family == socket.AF_INET:
+                    if addr.address != "127.0.0.1":
+                        return addr.address
+        return "127.0.0.1"
 
 
 class CpuUtils:
