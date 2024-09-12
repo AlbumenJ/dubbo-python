@@ -48,6 +48,7 @@ def generate(request):
 
     # 逐步生成 token 并实时返回
     generated_ids = []
+    stop_token = "<|endoftext|>"  # 假设这是结束标记
 
     # 设置每次生成的 token 数量和循环生成
     for step in range(0, 512000, 50):
@@ -69,6 +70,10 @@ def generate(request):
         # 通过 yield 返回部分生成结果
         yield llm_pb2.GenerateReply(message=str(partial_response))
 
+        # 如果生成的内容包含结束标记，提前停止生成
+        if stop_token in partial_response:
+            break
+
         # 将新生成的文本加入到下次输入中，确保模型使用完整的上下文
         model_inputs = tokenizer(
             text + partial_response,  # 在原始输入的基础上加上新生成的部分
@@ -77,6 +82,7 @@ def generate(request):
             padding="longest"
         ).to("cuda")
         model_inputs.input_ids = model_inputs.input_ids.long()  # 确保类型为 LongTensor
+
 
 if __name__ == "__main__":
     # build a method handler
