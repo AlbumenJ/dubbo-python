@@ -35,34 +35,48 @@ def generate(request):
         {"role": "user", "content": request.prompt}
     ]
 
+    # 使用 tokenizer 将消息模板转换为文本
     text = tokenizer.apply_chat_template(
         messages,
         tokenize=False,
         add_generation_prompt=True
     )
 
+    # 将输入文本转换为模型可以接受的张量，并确保 input_ids 类型为 LongTensor
     model_inputs = tokenizer([text], return_tensors="pt").to("cuda")
+    model_inputs.input_ids = model_inputs.input_ids.long()
 
+    # 逐步生成 token 并实时返回
     generated_ids = []
+
+    # 设置每次生成的 token 数量和循环生成
     for step in range(0, 512000, 50):
         output = model.generate(
             model_inputs.input_ids,
-            max_new_tokens=50,
+            max_new_tokens=50,  # 每次生成少量 token
             output_scores=False,
             return_dict_in_generate=True,
-            do_sample=False
+            do_sample=False  # 确保生成是确定性的
         )
 
+        # 提取生成的新 token
         new_tokens = output.sequences[:, model_inputs.input_ids.shape[-1]:]
         generated_ids.append(new_tokens)
 
+        # 解码新生成的 token 为文本
         partial_response = tokenizer.decode(new_tokens[0], skip_special_tokens=True)
 
+        # 通过 yield 返回部分生成结果
         yield llm_pb2.GenerateReply(message=str(partial_response))
 
+        # 将新生成的文本加入到下次输入中，确保模型使用完整的上下文
         model_inputs = tokenizer(
-            partial_response, return_tensors="pt", truncation=True, padding="longest"
+            text + partial_response,  # 在原始输入的基础上加上新生成的部分
+            return_tensors="pt",
+            truncation=True,
+            padding="longest"
         ).to("cuda")
+        model_inputs.input_ids = model_inputs.input_ids.long()  # 确保类型为 LongTensor
 
 if __name__ == "__main__":
     # build a method handler
