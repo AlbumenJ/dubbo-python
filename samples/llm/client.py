@@ -41,4 +41,4 @@ if __name__ == "__main__":
 
     result = stub.generate(llm_pb2.GenerateRequest(prompt=input("Please input your question: ")))
 
-    print(result.message)
+    print(result)
