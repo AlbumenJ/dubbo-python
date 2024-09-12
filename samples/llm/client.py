@@ -16,7 +16,7 @@
 from proto import llm_pb2
 
 import dubbo
-from dubbo.configs import ReferenceConfig
+from dubbo.configs import ReferenceConfig, RegistryConfig
 
 
 class GreeterServiceStub:
@@ -32,10 +32,13 @@ class GreeterServiceStub:
 
 
 if __name__ == "__main__":
-    reference_config = ReferenceConfig.from_url(
-        "tri://127.0.0.1:50051/org.apache.dubbo.samples.proto.LlmService?timeout=10000000"
+    registry_config = RegistryConfig.from_url("zookeeper://mse-791d01018-zk.mse.aliyuncs.com:2181")
+    bootstrap = dubbo.Dubbo(registry_config=registry_config)
+
+    reference_config = ReferenceConfig(
+        protocol="tri", service="org.apache.dubbo.samples.proto.LlmService"
     )
-    dubbo_client = dubbo.Client(reference_config)
+    dubbo_client = bootstrap.create_client(reference_config)
 
     stub = GreeterServiceStub(dubbo_client)
 

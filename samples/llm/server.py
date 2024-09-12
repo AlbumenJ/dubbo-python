@@ -16,7 +16,7 @@
 from proto import llm_pb2
 
 import dubbo
-from dubbo.configs import ServiceConfig
+from dubbo.configs import ServiceConfig, RegistryConfig
 from dubbo.proxy.handlers import RpcMethodHandler, RpcServiceHandler
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
@@ -106,9 +106,12 @@ if __name__ == "__main__":
         method_handlers={"generate": method_handler},
     )
 
+    registry_config = RegistryConfig.from_url("zookeeper://mse-791d01018-zk.mse.aliyuncs.com:2181")
+    bootstrap = dubbo.Dubbo(registry_config=registry_config)
+
     service_config = ServiceConfig(service_handler)
 
     # start the server
-    server = dubbo.Server(service_config).start()
+    server = bootstrap.create_server(service_config).start()
 
     input("Press Enter to stop the server...\n")
