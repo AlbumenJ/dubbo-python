@@ -39,9 +39,6 @@ if __name__ == "__main__":
 
     stub = GreeterServiceStub(dubbo_client)
 
-    def request_generator():
-        yield llm_pb2.GenerateRequest(prompt=input("Please input your question: "))
-
-    result = stub.generate(request_generator())
+    result = stub.generate(llm_pb2.GenerateRequest(prompt=input("Please input your question: ")))
 
     print(result.message)
