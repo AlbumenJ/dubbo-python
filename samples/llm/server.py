@@ -13,6 +13,8 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+from time import sleep
+
 from proto import llm_pb2
 
 import dubbo
@@ -27,6 +29,7 @@ model = AutoModelForCausalLM.from_pretrained(
 )
 
 tokenizer = AutoTokenizer.from_pretrained("Qwen/Qwen2-0.5B-Instruct")
+
 
 def generate(request):
     print(f"Received request: {request.prompt}")
@@ -114,4 +117,4 @@ if __name__ == "__main__":
     # start the server
     server = bootstrap.create_server(service_config).start()
 
-    input("Press Enter to stop the server...\n")
+    sleep(30 * 24 * 60 * 60)  # run the server for 30 days
